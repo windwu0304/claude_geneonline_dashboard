@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeneOnline 月度議題類別表現分析 | 2026.04.17 – 05.14</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e3e6eb;
+    --border-strong: #c9cdd4;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --accent: #2563eb;
+    --b2b: #0ea5e9;
+    --b2c: #f59e0b;
+    --fin: #6b7280;
+    --winner-bg: #ecfdf5;
+    --winner-text: #047857;
+    --warn-bg: #fef3c7;
+    --warn-text: #92400e;
+    --sans: 'Inter', 'Noto Sans TC', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  
+  /* === HEADER === */
+  .page-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  
+  .breadcrumb {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  
+  .header-meta span strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+  
+  /* === TL;DR === */
+  .tldr {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  
+  .tldr-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  
+  .tldr-content {
+    font-size: 15px;
+    color: var(--text);
+  }
+  
+  .tldr-content strong { font-weight: 600; }
+  
+  /* === SECTION === */
+  .section {
+    margin-bottom: 32px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .section-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+  
+  /* === KPI CARDS === */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .kpi-card.winner {
+    border-color: var(--winner-text);
+    box-shadow: 0 0 0 1px var(--winner-text);
+  }
+  
+  .kpi-card.winner::after {
+    content: '#1';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--winner-bg);
+    color: var(--winner-text);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+  
+  .kpi-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .kpi-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .kpi-card[data-cat="B2B"] .kpi-dot { background: var(--b2b); }
+  .kpi-card[data-cat="B2C"] .kpi-dot { background: var(--b2c); }
+  .kpi-card[data-cat="Finance"] .kpi-dot { background: var(--fin); }
+  
+  .kpi-cat {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .kpi-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  
+  .kpi-value {
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  
+  .kpi-unit {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  
+  .kpi-meta {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+  }
+  
+  .kpi-meta-row {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .kpi-meta-label {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  
+  .kpi-meta-val {
+    font-family: var(--mono);
+    font-weight: 500;
+    color: var(--text);
+  }
+  
+  /* === CHART CONTAINER === */
+  .chart-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  
+  .chart-canvas-wrap {
+    position: relative;
+    height: 320px;
+  }
+  
+  .chart-canvas-wrap.horizontal {
+    height: 200px;
+  }
+  
+  /* === DATA TABLE === */
+  .data-table {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    font-size: 13px;
+  }
+  
+  .data-table th {
+    background: #f9fafb;
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .data-table th:not(:first-child) { text-align: right; }
+  
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  
+  .data-table tr:last-child td { border-bottom: none; }
+  
+  .data-table td:not(:first-child) {
+    text-align: right;
+    font-family: var(--mono);
+    font-weight: 500;
+  }
+  
+  .data-table .winner-cell {
+    background: var(--winner-bg);
+    color: var(--winner-text);
+    font-weight: 600;
+  }
+  
+  .data-table .row-label {
+    font-weight: 500;
+  }
+  
+  .data-table .row-label .hint {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+  
+  /* === INSIGHT BLOCK === */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    border-top: 3px solid var(--border-strong);
+  }
+  
+  .insight-card[data-cat="B2B"] { border-top-color: var(--b2b); }
+  .insight-card[data-cat="B2C"] { border-top-color: var(--b2c); }
+  .insight-card[data-cat="Finance"] { border-top-color: var(--fin); }
+  
+  .insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .insight-cat {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .insight-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  
+  .insight-strengths {
+    margin-bottom: 12px;
+  }
+  
+  .insight-strengths-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  
+  .insight-strength-item {
+    font-size: 13px;
+    color: var(--text);
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .insight-strength-item:last-child { border-bottom: none; }
+  
+  .insight-strength-item .val {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  
+  .insight-top {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  
+  .insight-top-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  
+  .insight-top-item {
+    font-size: 12px;
+    color: var(--text);
+    padding: 4px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  .insight-top-item .title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .insight-top-item .num {
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  
+  /* === GLOSSARY === */
+  .glossary {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-size: 13px;
+  }
+  
+  .glossary-title {
+    font-weight: 600;
+    color: var(--warn-text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .glossary-title::before {
+    content: 'ℹ';
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    background: var(--warn-text);
+    color: white;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  .glossary-row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    padding: 8px 0;
+    border-top: 1px dashed #fde68a;
+  }
+  
+  .glossary-row:first-of-type { border-top: none; }
+  
+  .glossary-term {
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .glossary-def {
+    color: var(--text);
+  }
+  
+  .glossary-def code {
+    font-family: var(--mono);
+    background: #fef3c7;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  
+  /* === RECOMMENDATIONS === */
+  .rec-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .rec-goal {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  
+  .rec-action {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  
+  .rec-action .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-left: 4px;
+    font-weight: 600;
+  }
+  
+  .rec-action .tag.b2b { background: #e0f2fe; color: #0369a1; }
+  .rec-action .tag.b2c { background: #fef3c7; color: #92400e; }
+  .rec-action .tag.fin { background: #f3f4f6; color: #4b5563; }
+  
+  .rec-body {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  
+  /* === FOOTER === */
+  .footer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .footer-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  
+  .footer ol {
+    padding-left: 20px;
+    line-height: 1.8;
+  }
+  
+  /* === RWD === */
+  @media (max-width: 900px) {
+    .kpi-grid, .insight-grid, .rec-grid { grid-template-columns: 1fr; }
+    .header-meta { flex-direction: column; gap: 4px; }
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="breadcrumb">GA4 / GeneOnline_CH / Landing Page Analysis</div>
+    <h1>議題類別月度表現分析</h1>
+    <div class="header-meta">
+      <span>分析期間 <strong>2026.04.17 – 2026.05.14</strong></span>
+      <span>樣本數 <strong>187 篇</strong></span>
+      <span>類別 <strong>B2B / B2C / Finance</strong></span>
+      <span>評分基礎 <strong>流量 + 互動</strong></span>
+    </div>
+  </div>
+
+  <!-- TL;DR -->
+  <div class="tldr">
+    <div class="tldr-label">TL;DR</div>
+    <div class="tldr-content">
+      綜合表現 <strong>B2B 第一（72.8 分）</strong>、B2C 第二（68.2 分）、Finance 第三（30.0 分）。
+      但各類別有各自的強項：<strong>B2C 拿下總流量與爆款數冠軍</strong>，
+      <strong>Finance 單篇平均流量最高但讀者停留最短</strong>，
+      <strong>B2B 互動深度最佳</strong>，每 5 篇就有 1 篇能讓讀者停留超過 60 秒。
+    </div>
+  </div>
+
+  <!-- SECTION 1: KPI 三類別 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">1. 三類別綜合分數</div>
+      <div class="section-sub">綜合分數 = 總流量 × 30% + 平均流量 × 30% + 互動深度 × 40%　｜　三維度各自 min-max 正規化至 0–100 分後加權</div>
+    </div>
+    
+    <div class="kpi-grid">
+      <div class="kpi-card winner" data-cat="B2B">
+        <div class="kpi-header"><span class="kpi-dot"></span><span class="kpi-cat">B2B</span></div>
+        <div class="kpi-label">綜合分數</div>
+        <div class="kpi-value">72.8 <span class="kpi-unit">/100</span></div>
+        <div class="kpi-meta">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">文章數</span><span class="kpi-meta-val">56</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">總流量</span><span class="kpi-meta-val">6,843</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均流量</span><span class="kpi-meta-val">122 / 篇</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均停留</span><span class="kpi-meta-val">46.1 秒</span></div>
+        </div>
+      </div>
+      
+      <div class="kpi-card" data-cat="B2C">
+        <div class="kpi-header"><span class="kpi-dot"></span><span class="kpi-cat">B2C</span></div>
+        <div class="kpi-label">綜合分數</div>
+        <div class="kpi-value">68.2 <span class="kpi-unit">/100</span></div>
+        <div class="kpi-meta">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">文章數</span><span class="kpi-meta-val">94</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">總流量</span><span class="kpi-meta-val">10,574</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均流量</span><span class="kpi-meta-val">113 / 篇</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均停留</span><span class="kpi-meta-val">45.8 秒</span></div>
+        </div>
+      </div>
+      
+      <div class="kpi-card" data-cat="Finance">
+        <div class="kpi-header"><span class="kpi-dot"></span><span class="kpi-cat">Finance</span></div>
+        <div class="kpi-label">綜合分數</div>
+        <div class="kpi-value">30.0 <span class="kpi-unit">/100</span></div>
+        <div class="kpi-meta">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">文章數</span><span class="kpi-meta-val">47</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">總流量</span><span class="kpi-meta-val">5,807</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均流量</span><span class="kpi-meta-val">124 / 篇</span></div>
+          <div class="kpi-meta-row"><span class="kpi-meta-label">平均停留</span><span class="kpi-meta-val">38.5 秒</span></div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+
+  <!-- SECTION 2: 指標對照表 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">2. 指標對照表</div>
+      <div class="section-sub">綠底 = 該項冠軍</div>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>指標</th>
+          <th>B2B</th>
+          <th>B2C</th>
+          <th>Finance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">總流量<span class="hint">該類所有文章流量加總</span></td>
+          <td>6,843</td>
+          <td class="winner-cell">10,574</td>
+          <td>5,807</td>
+        </tr>
+        <tr>
+          <td class="row-label">平均流量 / 篇<span class="hint">總流量 ÷ 文章數</span></td>
+          <td>122</td>
+          <td>113</td>
+          <td class="winner-cell">124</td>
+        </tr>
+        <tr>
+          <td class="row-label">中位數流量<span class="hint">排在最中間那篇文章的流量</span></td>
+          <td>74.5</td>
+          <td>72</td>
+          <td class="winner-cell">79</td>
+        </tr>
+        <tr>
+          <td class="row-label">平均停留秒數<span class="hint">每次造訪平均閱讀時間</span></td>
+          <td class="winner-cell">46.1</td>
+          <td>45.8</td>
+          <td>38.5</td>
+        </tr>
+        <tr>
+          <td class="row-label">爆款文章數<span class="hint">sessions ≥ 200 的文章數</span></td>
+          <td>6</td>
+          <td class="winner-cell">13</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td class="row-label">高互動文章占比<span class="hint">停留 ≥60 秒的文章 ÷ 該類文章數</span></td>
+          <td class="winner-cell">23.2%</td>
+          <td>17.0%</td>
+          <td>10.6%</td>
+        </tr>
+        <tr>
+          <td class="row-label">Top10 流量集中度<span class="hint">前10名文章占該類總流量的比例</span></td>
+          <td>50.8%</td>
+          <td>30.9%</td>
+          <td>52.7%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 3: 爆款 vs 互動 圖 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">3. 爆款 vs 互動深度</div>
+      <div class="section-sub">左軸 = 爆款數（橘）／右軸 = 高互動占比（藍）</div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-canvas-wrap">
+        <canvas id="hitsChart" role="img" aria-label="爆款與高互動雙軸圖"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: 關鍵洞察 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">4. 各類別關鍵洞察</div>
+      <div class="section-sub">本月 TOP3 文章</div>
+    </div>
+    
+    <div class="insight-grid">
+      <div class="insight-card" data-cat="B2B">
+        <div class="insight-header">
+          <div class="insight-cat">B2B 產業/技術</div>
+          <div class="insight-badge">綜合 #1</div>
+        </div>
+        <div class="insight-strengths">
+          <div class="insight-strengths-label">強項</div>
+          <div class="insight-strength-item"><span>互動深度最佳</span><span class="val">46.1 秒</span></div>
+          <div class="insight-strength-item"><span>高互動文章占比</span><span class="val">23.2%</span></div>
+        </div>
+        <div class="insight-top">
+          <div class="insight-top-label">本月 TOP3</div>
+          <div class="insight-top-item"><span class="title">氫能電極技術</span><span class="num">763</span></div>
+          <div class="insight-top-item"><span class="title">免疫腫瘤學十年回顧</span><span class="num">630</span></div>
+          <div class="insight-top-item"><span class="title">電控液晶透鏡技術</span><span class="num">539</span></div>
+        </div>
+      </div>
+      
+      <div class="insight-card" data-cat="B2C">
+        <div class="insight-header">
+          <div class="insight-cat">B2C 大眾健康</div>
+          <div class="insight-badge">流量 #1</div>
+        </div>
+        <div class="insight-strengths">
+          <div class="insight-strengths-label">強項</div>
+          <div class="insight-strength-item"><span>總流量最高</span><span class="val">10,574</span></div>
+          <div class="insight-strength-item"><span>爆款文章最多</span><span class="val">13 篇</span></div>
+        </div>
+        <div class="insight-top">
+          <div class="insight-top-label">本月 TOP3</div>
+          <div class="insight-top-item"><span class="title">諾羅病毒症狀</span><span class="num">509</span></div>
+          <div class="insight-top-item"><span class="title">2025 國際護師節</span><span class="num">397</span></div>
+          <div class="insight-top-item"><span class="title">HMPV 疫情現況</span><span class="num">350</span></div>
+        </div>
+      </div>
+      
+      <div class="insight-card" data-cat="Finance">
+        <div class="insight-header">
+          <div class="insight-cat">Finance 法說/公告</div>
+          <div class="insight-badge">短進短出</div>
+        </div>
+        <div class="insight-strengths">
+          <div class="insight-strengths-label">強項 / 弱項</div>
+          <div class="insight-strength-item"><span>單篇均量最高</span><span class="val">124 / 篇</span></div>
+          <div class="insight-strength-item" style="color: var(--warn-text);"><span>停留時間最短</span><span class="val">38.5 秒</span></div>
+        </div>
+        <div class="insight-top">
+          <div class="insight-top-label">本月 TOP3</div>
+          <div class="insight-top-item"><span class="title">Steminent 法說會</span><span class="num">732</span></div>
+          <div class="insight-top-item"><span class="title">EirGenix 法說會</span><span class="num">718</span></div>
+          <div class="insight-top-item"><span class="title">Alarpharm 法說會</span><span class="num">284</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: 名詞解釋 -->
+  <div class="section">
+    <div class="glossary">
+      <div class="glossary-title">名詞解釋</div>
+      <div class="glossary-row">
+        <div class="glossary-term">中位數</div>
+        <div class="glossary-def">把該類所有文章按流量從低到高排，<strong>正中間那一篇的流量值</strong>。中位數比平均數更能反映「典型一篇文章長什麼樣」，因為它不會被少數爆款拉高。<br>例：B2C 平均 113、中位數只有 72，代表多數 B2C 文章流量在 70 上下，是少數爆款把平均拉高。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">爆款</div>
+        <div class="glossary-def">本報告定義為 <code>sessions ≥ 200</code> 的文章。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">高互動</div>
+        <div class="glossary-def">本報告定義為 <code>平均停留秒數 ≥ 60 秒</code> 的文章。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">流量集中度</div>
+        <div class="glossary-def">前 10 名文章占該類總流量的比例。比例越高，代表越靠少數神文撐起整類；比例越低，代表越「多點開花」。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: 來源分析 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">6. 流量來源分析</div>
+      <div class="section-sub">Session source / medium · 本期總流量 36,397</div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(4,1fr); margin-bottom:12px;">
+      <div class="kpi-card winner" data-cat="B2B">
+        <div class="kpi-label">搜尋引擎（含 Google 新聞）</div>
+        <div class="kpi-value" style="font-size:28px;">80.7%</div>
+        <div class="kpi-meta" style="grid-template-columns:1fr;">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">Sessions</span><span class="kpi-meta-val">29,388</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" data-cat="B2C">
+        <div class="kpi-label">直接流量</div>
+        <div class="kpi-value" style="font-size:28px;">16.7%</div>
+        <div class="kpi-meta" style="grid-template-columns:1fr;">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">Sessions</span><span class="kpi-meta-val">6,071</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" data-cat="Finance">
+        <div class="kpi-label">社群 / 電子報 / 其他</div>
+        <div class="kpi-value" style="font-size:28px;">2.5%</div>
+        <div class="kpi-meta" style="grid-template-columns:1fr;">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">Sessions</span><span class="kpi-meta-val">~909</span></div>
+        </div>
+      </div>
+      <div class="kpi-card" data-cat="Finance">
+        <div class="kpi-label">AI 平台導流（ChatGPT / Perplexity / Gemini）</div>
+        <div class="kpi-value" style="font-size:28px;">0.8%</div>
+        <div class="kpi-meta" style="grid-template-columns:1fr;">
+          <div class="kpi-meta-row"><span class="kpi-meta-label">Sessions</span><span class="kpi-meta-val">300</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container" style="margin-bottom:12px;">
+      <div class="chart-canvas-wrap horizontal" style="height:340px;">
+        <canvas id="sourceChart" role="img" aria-label="各流量來源 sessions 水平條形圖"></canvas>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>來源</th>
+          <th>Sessions</th>
+          <th>佔比</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Google 自然搜尋</td>
+          <td class="winner-cell">27,946</td>
+          <td class="winner-cell">76.8%</td>
+          <td style="font-size:12px; color:var(--text-muted);">SEO 是最大流量引擎</td>
+        </tr>
+        <tr>
+          <td class="row-label">直接流量<span class="hint">(direct) / (none)</span></td>
+          <td>6,071</td>
+          <td>16.7%</td>
+          <td style="font-size:12px; color:var(--text-muted);">書籤、Email 貼結、App 內嵌等</td>
+        </tr>
+        <tr>
+          <td class="row-label">Google 新聞</td>
+          <td>849</td>
+          <td>2.3%</td>
+          <td style="font-size:12px; color:var(--text-muted);">以 B2C / B2B 時事文章為主</td>
+        </tr>
+        <tr>
+          <td class="row-label">Bing 搜尋</td>
+          <td>366</td>
+          <td>1.0%</td>
+          <td style="font-size:12px; color:var(--text-muted);"></td>
+        </tr>
+        <tr>
+          <td class="row-label">Yahoo 搜尋（TW + HK）</td>
+          <td>265</td>
+          <td>0.7%</td>
+          <td style="font-size:12px; color:var(--text-muted);"></td>
+        </tr>
+        <tr>
+          <td class="row-label">CMoney 導流</td>
+          <td>205</td>
+          <td>0.6%</td>
+          <td style="font-size:12px; color:var(--text-muted);">Finance 類文章為主</td>
+        </tr>
+        <tr>
+          <td class="row-label">電子報 Mailchimp</td>
+          <td>187</td>
+          <td>0.5%</td>
+          <td style="font-size:12px; color:var(--text-muted);">互動質量高（平均停留明顯偏長）</td>
+        </tr>
+        <tr>
+          <td class="row-label">Facebook / l.facebook.com</td>
+          <td>156</td>
+          <td>0.4%</td>
+          <td style="font-size:12px; color:var(--text-muted);"></td>
+        </tr>
+        <tr>
+          <td class="row-label">Perplexity AI</td>
+          <td>146</td>
+          <td>0.4%</td>
+          <td style="font-size:12px; color:var(--text-muted); color:#7c3aed; font-weight:500;">AI 導流中最大來源</td>
+        </tr>
+        <tr>
+          <td class="row-label">ChatGPT</td>
+          <td>82</td>
+          <td>0.2%</td>
+          <td style="font-size:12px; color:var(--text-muted);"></td>
+        </tr>
+        <tr>
+          <td class="row-label">Google Gemini</td>
+          <td>72</td>
+          <td>0.2%</td>
+          <td style="font-size:12px; color:var(--text-muted);"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="glossary" style="margin-top:12px;">
+      <div class="glossary-title">來源洞察</div>
+      <div class="glossary-row">
+        <div class="glossary-term">SEO 依賴度高</div>
+        <div class="glossary-def">76.8% 來自 Google 自然搜尋，代表 GeneOnline 的流量<strong>高度仰賴 SEO 排名</strong>。一旦 Google 演算法調整，影響巨大。建議分散渠道，強化電子報與社群經營。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">電子報質量 > 數量</div>
+        <div class="glossary-def">Mailchimp 只帶來 187 sessions（0.5%），但從個別文章數據來看，電子報讀者的<strong>平均停留時間明顯偏長</strong>（如 CTCL 文章 Mailchimp 讀者停留 156 秒 vs 整體 95 秒）。電子報受眾黏著度最高，值得加碼。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">AI 平台導流已現</div>
+        <div class="glossary-def">ChatGPT + Perplexity + Gemini 合計 300 sessions（0.8%），目前量體尚小，但<strong>已成真實流量來源</strong>。Perplexity 是最大 AI 來源。未來隨 AI 搜尋普及，這個比例可能快速成長。</div>
+      </div>
+      <div class="glossary-row">
+        <div class="glossary-term">直接流量 16.7%</div>
+        <div class="glossary-def">包含書籤、App 內嵌連結、EMAIL 複製貼上等。Finance 類法說會公告的直接流量比例特別高，反映<strong>投資人有主動追蹤 GeneOnline 的習慣</strong>（書籤或 Line 群組擴散）。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: 策略建議 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">7. 策略建議</div>
+      <div class="section-sub">依目標選擇優先類別</div>
+    </div>
+    
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="rec-goal">目標：建立專業權威</div>
+        <div class="rec-action">加碼 <span class="tag b2b">B2B</span></div>
+        <div class="rec-body">讀者品質最佳、停留時間最久。深度技術文與產業洞察可累積長期品牌資產。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-goal">目標：衝總流量 / SEO</div>
+        <div class="rec-action">主打 <span class="tag b2c">B2C</span></div>
+        <div class="rec-body">爆款率最高、長尾關鍵字最多，是流量基本盤。靠多篇而非單篇取勝。</div>
+      </div>
+      <div class="rec-card">
+        <div class="rec-goal">目標：投資人即時資訊</div>
+        <div class="rec-action">維持 <span class="tag fin">Finance</span></div>
+        <div class="rec-body">流量穩定但短進短出，難轉為黏著讀者。當作即時資訊服務，不期待長期經營效益。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-title">資料說明與限制</div>
+    <ol>
+      <li>分類依文章標題自動判讀，邊界案例可能有 5–10% 歸類爭議（如「諾貝爾獎」歸 B2C，亦可視為 B2B 產業新聞）。</li>
+      <li>因試算表讀取部分截斷，分析涵蓋前約 200 篇文章；尾部低流量文章未納入，但對結論影響有限。</li>
+      <li>未納入 key_events 與 total_revenue 兩欄：前者多數為 0、後者數值極小且分散。</li>
+      <li>綜合分數權重設計：總流量 30%、平均流量 30%、互動深度 40%，三維度皆以 min-max 正規化至 0–100。</li>
+      <li>建議補上「流量來源」（自然搜尋／社群／電子報）以判斷哪類內容適合哪個渠道。</li>
+    </ol>
+  </div>
+
+</div>
+
+<script>
+Chart.defaults.font.family = "'Inter', 'Noto Sans TC', sans-serif";
+Chart.defaults.color = '#6b7280';
+Chart.defaults.font.size = 12;
+
+
+
+// === 流量來源水平條形圖 ===
+new Chart(document.getElementById('sourceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Google 自然搜尋', '直接流量', 'Google 新聞', 'Bing 搜尋', 'Yahoo 搜尋', 'CMoney', '電子報', 'Facebook', 'Perplexity AI', 'ChatGPT', 'Gemini'],
+    datasets: [{
+      label: 'Sessions',
+      data: [27946, 6071, 849, 366, 265, 205, 187, 156, 146, 82, 72],
+      backgroundColor: [
+        '#0ea5e9','#6b7280','#0ea5e9','#6b7280','#6b7280',
+        '#f59e0b','#f59e0b','#f59e0b','#7c3aed','#7c3aed','#7c3aed'
+      ],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (c) => ' ' + c.parsed.x.toLocaleString() + ' sessions' } }
+    },
+    scales: {
+      x: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { callback: v => v >= 1000 ? (v/1000)+'K' : v } },
+      y: { grid: { display: false }, ticks: { font: { size: 12 } } }
+    }
+  }
+});
+
+
+new Chart(document.getElementById('hitsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['B2B', 'B2C', 'Finance'],
+    datasets: [
+      {
+        label: '爆款文章數（≥200 sessions）',
+        data: [6, 13, 5],
+        backgroundColor: '#f59e0b',
+        yAxisID: 'y1',
+        borderRadius: 4
+      },
+      {
+        label: '高互動占比（停留 ≥60 秒，%）',
+        data: [23.2, 17.0, 10.6],
+        backgroundColor: '#0ea5e9',
+        yAxisID: 'y2',
+        borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', align: 'end', labels: { boxWidth: 12, padding: 16 } }
+    },
+    scales: {
+      y1: {
+        type: 'linear', position: 'left', beginAtZero: true,
+        title: { display: true, text: '爆款數（篇）' },
+        grid: { color: '#f3f4f6' }
+      },
+      y2: {
+        type: 'linear', position: 'right', beginAtZero: true, max: 30,
+        title: { display: true, text: '高互動占比（%）' },
+        grid: { drawOnChartArea: false },
+        ticks: { callback: v => v + '%' }
+      },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
